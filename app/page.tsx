@@ -27,7 +27,7 @@ function enrichProjetos(projetos: Projeto[], sessoes: Sessao[], tarefas: Tarefa[
       tarefas_concluidas,
       tarefas_pendentes,
       ultima_sessao_titulo: ultimaSessao?.titulo,
-      ultimo_proximo_passo: ultimaSessao?.proximo_passo,
+      ultimo_proximo_passo: ultimaSessao?.proximo_passo ?? undefined,
     }
   })
 }
