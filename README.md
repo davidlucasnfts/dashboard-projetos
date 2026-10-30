@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# dashboard-projetos
 
-## Getting Started
+Dashboard pessoal para gerenciar projetos de desenvolvimento. Conecta-se ao Supabase e sincroniza dados a partir dos arquivos markdown de cada projeto (`MEMORY.md`, `SESSION-CONTEXT.md`, `ROADMAP.md`, `AGENTS.md`).
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Objetivo
+
+Centralizar em um único lugar:
+
+- Visão geral de todos os projetos ativos.
+- Métricas de produtividade (sessões, tempo investido, tarefas).
+- Histórico de entregas e atividades recentes.
+- Próximos passos e débitos técnicos.
+- Kanban com tarefas pendentes.
+
+---
+
+## Stack
+
+- **Framework:** Next.js 16.4.3 (App Router)
+- **Linguagem:** TypeScript 5
+- **Estilos:** Tailwind CSS 4
+- **Banco de dados:** Supabase (PostgreSQL)
+- **Ícones:** Lucide React
+- **Datas:** date-fns
+
+---
+
+## Estrutura de pastas
+
+```
+app/
+  page.tsx                 # Dashboard principal
+  layout.tsx               # Layout root
+  projeto/[slug]/page.tsx  # Detalhe do projeto
+  globals.css              # Estilos globais (Tailwind 4)
+  api/sync/route.ts        # Sincronização de dados via GitHub ou arquivos locais
+components/
+  ProjectCard.tsx          # Card do projeto no dashboard
+  MetricsCards.tsx         # Métricas consolidadas
+  SessionTimeline.tsx      # Timeline de atividades (com "ver mais")
+  KanbanBoard.tsx          # Kanban de tarefas
+  NewSessionModal.tsx      # Modal de registro manual de sessão
+  SyncButton.tsx           # Botão de sincronização
+lib/
+  supabase.ts              # Cliente Supabase e queries
+  parsers/
+    beautflow.ts           # Parser específico do BeautFlow
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Documentação do projeto
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+A documentação do próprio dashboard segue o mesmo padrão dos projetos monitorados:
 
-## Learn More
+- [`docs/MEMORY.md`](docs/MEMORY.md) — histórico de entregas.
+- [`docs/SESSION-CONTEXT.md`](docs/SESSION-CONTEXT.md) — estado atual, próximos passos e débitos técnicos.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — planejamento, requisitos funcionais e não-funcionais.
+- [`docs/AGENTS.md`](docs/AGENTS.md) — regras do projeto e erros registrados (Self-Healing).
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Como rodar localmente
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm install
+npm run dev
+```
 
-## Deploy on Vercel
+Abra [http://localhost:3000](http://localhost:3000) no navegador.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+> O servidor já deve estar rodando durante o desenvolvimento ativo. Alterações refletem automaticamente via hot-reload.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Variáveis de ambiente
+
+Crie um arquivo `.env.local` na raiz:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://<seu-projeto>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<sua-anon-key>
+
+# Opcional — apenas se os repositórios dos projetos forem privados
+GITHUB_TOKEN=<seu-token-do-github>
+```
+
+> Se alterar `.env.local`, reinicie o servidor (`npm run dev`) para que as mudanças tenham efeito.
+
+---
+
+## Sincronização de projetos
+
+O botão **"Sincronizar STATUS"** no dashboard executa a API `/api/sync`, que:
+
+1. Busca os arquivos markdown do repositório GitHub do projeto (quando configurado).
+2. Se não houver repo configurado, lê do disco local como fallback.
+3. Extrai sessões, tarefas, progresso e status.
+4. Atualiza o banco de dados no Supabase.
+
+Projetos configurados no GitHub:
+
+| Projeto | Repositório | Branch |
+|---|---|---|
+| BeautFlow | `davidlucasnfts/BeautFllow` | `main` |
+
+Os demais projetos ainda usam caminho local (não funcionam na Vercel até que sejam mapeados).
+
+---
+
+## Próximos marcos
+
+Ver [`docs/ROADMAP.md`](docs/ROADMAP.md) para o planejamento completo.
+
+Resumo:
+
+- [x] Correções críticas e dashboard visual
+- [x] Sincronização do BeautFlow
+- [ ] Sincronização dos demais projetos
+- [ ] Kanban interativo (mover cards)
+- [ ] Tela de configuração de projetos
+- [ ] Relatórios de produtividade
